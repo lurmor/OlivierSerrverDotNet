@@ -10,7 +10,12 @@ namespace OlivierSerrverDotNet
     {
         static void Main(string[] args)
         {
-            TcpConector tcpConector = new TcpConector();
+            TcpConector tcpConector = new TcpConector(8739);
+            while (true)
+            {
+                tcpConector.Update();
+
+            }
         }
     }
 }
