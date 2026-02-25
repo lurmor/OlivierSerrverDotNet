@@ -24,27 +24,27 @@ public class TcpConector
             if (client.Connected)
             {
                 NetworkStream stream = new NetworkStream(client.Client, ownsSocket: false);
-                using (stream)
+                // using (stream)
+                // {
+                try
                 {
-                    try
+                    string? message = ReceiveMessage(stream);
+                    if (message != null)
                     {
-                        string? message = ReceiveMessage(stream);
-                        if (message != null)
-                        {
-                            Console.WriteLine("Received: " + message);
+                        Console.WriteLine("Received: " + message);
 
-                            // Обработка сообщения и отправка ответа клиенту
-                            string response = ProcessMessage(stream, message);
-                            ///SendMessage(stream, response);
-                            //Console.WriteLine("Response: " + response);
+                        // Обработка сообщения и отправка ответа клиенту
+                        string response = ProcessMessage(stream, message);
+                        ///SendMessage(stream, response);
+                        //Console.WriteLine("Response: " + response);
 
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Error.WriteLine(e);
                     }
                 }
+                catch (Exception e)
+                {
+                    Console.Error.WriteLine(e);
+                }
+                // }
             }
         }
     }
@@ -92,6 +92,13 @@ public class TcpConector
         Array.Copy(messageBytes, 0, buffer, 2, messageBytes.Length);
 
         stream.Write(buffer, 0, buffer.Length);
+    }
+    public static void SendMessage(TcpClient client, string message)
+    {
+        NetworkStream stream = new NetworkStream(client.Client, ownsSocket: false);
+        using (stream)
+        { SendMessage(stream, message); }
+
     }
 
 }

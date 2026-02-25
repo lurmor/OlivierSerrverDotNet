@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using System.Net.Sockets;
 
 namespace OlivierSerrverDotNet;
@@ -26,7 +27,7 @@ public class UnitColector
     }
     private int LoadFomFile(string fileName) { return 0; }
 
-    public void conectTCPcli(NetworkStream tcpcli, string Data)
+    public void conectTCPcli(NetworkStream tcpStr, string Data)
     {
         var splitedData = Data.Split('-');
         uint SN = uint.Parse(splitedData[1]);
@@ -35,34 +36,46 @@ public class UnitColector
 
             if (unit.SN == SN)
             {
-                unit.tcpClient = tcpcli;
-                unit.remoteEnd = tcpcli.Socket.RemoteEndPoint;
+                unit.tcpStream = tcpStr;
+                unit.remoteEnd = tcpStr.Socket.RemoteEndPoint;
                 unit.conected = true;
-                TcpConector.SendMessage(tcpcli, "Conect Sucses");
+                TcpConector.SendMessage(tcpStr, "Conect Sucses");
 
                 return;
             }
         }
-        var newunit = OlivierUnit.CreateOlivierUnit(uint.Parse(splitedData[1]), tcpcli,
+        var newunit = OlivierUnit.CreateOlivierUnit(uint.Parse(splitedData[1]), tcpStr,
                                      (UnitType)uint.Parse(splitedData[2]));
         if (newunit != null)
         {
             olivierUnits.Add(newunit);
-            TcpConector.SendMessage(tcpcli, "Conect Sucses");
+            TcpConector.SendMessage(tcpStr, "Conect Sucses");
         }
     }
 
-    public void disconectTCPcli(NetworkStream tcpcli)
+    public void disconectTCPcli(NetworkStream tcpStr)
     {
         foreach (var unit in olivierUnits)
         {
-            if (unit.tcpClient == tcpcli)
+            if (unit.tcpStream == tcpStr)
             {
-                unit.tcpClient = null;
+                unit.tcpStream = null;
                 unit.remoteEnd = null;
                 unit.conected = false;
                 return;
             }
         }
+    }
+
+    public OlivierUnit? GetUnit(uint SN)
+    {
+        foreach (var unit in olivierUnits)
+        {
+            if (unit.SN == SN)
+            {
+                return unit;
+            }
+        }
+        return null;
     }
 }
