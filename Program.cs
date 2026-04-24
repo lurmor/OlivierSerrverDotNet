@@ -21,7 +21,7 @@ namespace OlivierSerrverDotNet
                     input = Console.ReadLine();
                 }
             });
-
+            UnitColector.getInstance().LoadFomFile("Items.json");
             TcpConector tcpConector = new TcpConector(8739);
             NTP ntp = new NTP(1230);
             while (true)
@@ -40,11 +40,18 @@ namespace OlivierSerrverDotNet
                     var splitedInput = input.Split(' ');
                     if (splitedInput.Length == 2)
                     {
-
+                        // 1234567890 DT192.168.1.100
                         var unit = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[0]));
                         if (unit != null && unit.tcpStream != null)
                         {
                             TcpConector.SendMessage(unit.tcpStream, splitedInput[1]);
+                        }
+                    }
+                    if (splitedInput.Length == 1)
+                    {
+                        if (splitedInput[0] == "Save")
+                        {
+                            UnitColector.getInstance().SaveToFile("Items.json");
                         }
                     }
                     input = null;

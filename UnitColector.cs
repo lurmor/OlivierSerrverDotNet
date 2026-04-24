@@ -1,12 +1,14 @@
 using System;
 using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 
 namespace OlivierSerrverDotNet;
 
 public class UnitColector
 {
     private static UnitColector? instance;
+    private List<OlivierUnit> olivierUnits = new List<OlivierUnit>();
 
     private UnitColector()
     { }
@@ -18,14 +20,39 @@ public class UnitColector
         return instance;
     }
 
-    private List<OlivierUnit> olivierUnits = new List<OlivierUnit>();
 
 
     public UnitColector(string fileName)
     {
         LoadFomFile(fileName);
     }
-    private int LoadFomFile(string fileName) { return 0; }
+    public int LoadFomFile(string fileName)
+    {
+        var LoadedUnits = JsonSerializer.Deserialize<List<OlivierUnit>>(
+            File.ReadAllText(fileName),
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IncludeFields = true
+            }
+        );
+        if (LoadedUnits != null)
+            olivierUnits = LoadedUnits;
+        return olivierUnits.Count;
+    }
+
+    public void SaveToFile(string fileName)
+    {
+        string json = JsonSerializer.Serialize(
+            olivierUnits,
+            new JsonSerializerOptions
+            {
+                WriteIndented = true,
+                IncludeFields = true
+            });
+
+        File.WriteAllText(fileName, json);
+    }
 
     public void conectTCPcli(NetworkStream tcpStr, string Data)
     {
@@ -39,17 +66,20 @@ public class UnitColector
                 unit.tcpStream = tcpStr;
                 unit.remoteEnd = tcpStr.Socket.RemoteEndPoint;
                 unit.conected = true;
-                TcpConector.SendMessage(tcpStr, "Conect Sucses");
+                TcpConector.SendMessage(tcpStr, "unit ReConect Sucses");
+                Console.WriteLine("unit ReConect Sucses");
+
 
                 return;
             }
         }
-        var newunit = OlivierUnit.CreateOlivierUnit(uint.Parse(splitedData[1]), tcpStr,
+        var newunit = new OlivierUnit(uint.Parse(splitedData[1]), tcpStr,
                                      (UnitType)uint.Parse(splitedData[2]));
         if (newunit != null)
         {
             olivierUnits.Add(newunit);
-            TcpConector.SendMessage(tcpStr, "Conect Sucses");
+            TcpConector.SendMessage(tcpStr, "unit Conect Sucses");
+            Console.WriteLine("unit Conect Sucses");
         }
     }
 

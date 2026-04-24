@@ -24,15 +24,17 @@ public class NTP
         if (udp.Available > 0)
         {
             byte[] request = udp.Receive(ref remoteEP);
-            Console.WriteLine($"[{DateTime.Now}] Request from {remoteEP.Address}");
+            Console.WriteLine($"[{DateTime.Now}] Request from {remoteEP.Address} Request {request.ToString()}");
+            if (request[0] == 'T')
+            {
+                long ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                byte[] resp = BitConverter.GetBytes(ms);
 
-            long ms = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            byte[] resp = BitConverter.GetBytes(ms);
+                if (BitConverter.IsLittleEndian)
+                    Array.Reverse(resp);
 
-            if (BitConverter.IsLittleEndian)
-                Array.Reverse(resp);
-
-            udp.Send(resp, resp.Length, remoteEP);
+                udp.Send(resp, resp.Length, remoteEP);
+            }
         }
 
     }
