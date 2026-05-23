@@ -29,35 +29,41 @@ namespace OlivierSerrverDotNet
                 tcpConector.Update();
                 ntp.Update();
 
-
-                // if (Console.In.Peek() != -1)
-                // {
-                //var key = Console.ReadKey(true);
-                //if (key.Key == ConsoleKey.Enter)
-                //input = Console.ReadLine();
                 if (input != null)
                 {
-                    var splitedInput = input.Split(' ');
-                    if (splitedInput.Length == 2)
-                    {
-                        // 1234567890 DT192.168.1.100
-                        var unit = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[0]));
-                        if (unit != null && unit.tcpStream != null)
-                        {
-                            TcpConector.SendMessage(unit.tcpStream, splitedInput[1]);
-                        }
-                    }
-                    if (splitedInput.Length == 1)
-                    {
-                        if (splitedInput[0] == "Save")
-                        {
-                            UnitColector.getInstance().SaveToFile("Items.json");
-                        }
-                    }
+                    ParseInput(input);
                     input = null;
                 }
-                //input += key.KeyChar;
+
+            }
+        }
+        static void ParseInput(string input)
+        {
+            var splitedInput = input.Split(' ');
+            if (splitedInput.Length == 2)
+            {
+                // 1234567890 DT192.168.1.100
+                UnitColector colector = UnitColector.getInstance();
+
+
+                var unitFrom = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[0]));
+                var unitTo = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[1]));
+                if (unitFrom != null && unitTo != null)
+                {
+                    colector.UnitConect(unitFrom, unitTo);
+                }
+
+                // if (unit != null && unit.tcpStream != null)
+                // {
+                //     TcpConector.SendMessage(unit.tcpStream, splitedInput[1]);
                 // }
+            }
+            if (splitedInput.Length == 1)
+            {
+                if (splitedInput[0] == "Save")
+                {
+                    UnitColector.getInstance().SaveToFile("Items.json");
+                }
             }
         }
     }

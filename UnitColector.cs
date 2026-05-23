@@ -96,6 +96,10 @@ public class UnitColector
             }
         }
     }
+    public Transfer UnitConect(OlivierUnit from, OlivierUnit to, int Lchanel = 1, int Rchanel = 2)
+    {
+        return new Transfer(from, to, Lchanel, Rchanel);
+    }
 
     public OlivierUnit? GetUnit(uint SN)
     {
