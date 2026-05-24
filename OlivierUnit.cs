@@ -12,29 +12,7 @@ public enum ModuleType { NAM, DAC, ADC, BT, BP };
 
 [Serializable]
 
-public class Transfer
-{
-    public readonly OlivierUnit from;
-    public readonly OlivierUnit to;
-    int Rchanel, Lchanel;
 
-    public Transfer(OlivierUnit from, OlivierUnit to, int Lchanel, int Rchanel)
-    {
-        this.Rchanel = Rchanel;
-        this.Lchanel = Lchanel;
-        this.from = from;
-        this.to = to;
-        from.addTransfer(this);
-
-    }
-    int getChCount()
-    {
-        int chCount = 0;
-        if (Rchanel != 0) chCount++;
-        if (Lchanel != 0) chCount++;
-        return chCount;
-    }
-}
 // public abstract class OlivierUnit
 public class OlivierUnit
 {
@@ -47,7 +25,7 @@ public class OlivierUnit
     [JsonIgnore]
     public NetworkStream? tcpStream;
     [JsonIgnore]
-    List<Transfer> transfers = new List<Transfer>();
+    // List<Transfer> transfers = new List<Transfer>();
     //public readonly Type type
 
     public List<ModuleType> Modules = new List<ModuleType>();
@@ -112,40 +90,37 @@ public class OlivierUnit
         }
         catch
         {
+            Console.WriteLine("ERROR send" + tcpStream + message);
             return false;
         }
         return true;
     }
 
-    public void addTransfer(Transfer transfer)
-    {
-        if (conected && tcpStream != null && transfer.to.remoteEnd != null && transfer.to.tcpStream != null)
-        {
-            string data = "DT" + transfer.to.remoteEnd.ToString().Split(':')[0];
-            TcpConector.SendMessage(tcpStream, data);
-            data = "DR";
-            TcpConector.SendMessage(transfer.to.tcpStream, data);
-            transfers.Add(transfer);
-        }
-        else
-        {
-            Console.Error.WriteLine("Falled add transfer");
-        }
 
-    }
 }
 
-// public class OlivierUnitSourse : OlivierUnit
-// {
-//     public OlivierUnitSourse(uint _SN, NetworkStream _tcpStream) : base(_SN, _tcpStream, UnitType.ONLY_SOURSE) { }
-// }
 
-// public class OlivierUnitExit : OlivierUnit
-// {
-//     public OlivierUnitExit(uint _SN, NetworkStream _tcpStream) : base(_SN, _tcpStream, UnitType.ONLY_EXIT) { }
-// }
+public class Transfer
+{
+    public readonly OlivierUnit from;
+    public readonly OlivierUnit to;
+    int Rchanel, Lchanel;
 
-// public class OlivierUnitBybass : OlivierUnit
-// {
-//     public OlivierUnitBybass(uint _SN, NetworkStream _tcpStream) : base(_SN, _tcpStream, UnitType.BYPASS) { }
-// }
+    public Transfer(OlivierUnit from, OlivierUnit to, int Lchanel, int Rchanel)
+    {
+        this.Rchanel = Rchanel;
+        this.Lchanel = Lchanel;
+        this.from = from;
+        this.to = to;
+        //from.addTransfer(this);
+
+    }
+    int getChCount()
+    {
+        int chCount = 0;
+        if (Rchanel != 0) chCount++;
+        if (Lchanel != 0) chCount++;
+        return chCount;
+    }
+
+}

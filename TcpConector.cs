@@ -23,7 +23,7 @@ public class TcpConector
         {
             if (client.Connected)
             {
-                NetworkStream stream = new NetworkStream(client.Client, ownsSocket: false);
+                NetworkStream stream = client.GetStream(); ;
                 // using (stream)
                 // {
                 try
@@ -35,8 +35,11 @@ public class TcpConector
 
                         // Обработка сообщения и отправка ответа клиенту
                         string response = ProcessMessage(stream, message);
-                        ///SendMessage(stream, response);
-                        //Console.WriteLine("Response: " + response);
+                        if (response != "")
+                        {
+                            SendMessage(stream, response);
+                            Console.WriteLine("Response: " + response);
+                        }
 
                     }
                 }
@@ -45,6 +48,13 @@ public class TcpConector
                     Console.Error.WriteLine(e);
                 }
                 // }
+            }
+            else
+            {
+                tcpClients.Remove(client);
+                Console.WriteLine("Client DISconnected!");
+                UnitColector.getInstance().disconectTCPcli(client.GetStream());
+
             }
         }
     }
@@ -78,9 +88,9 @@ public class TcpConector
 
     private string ProcessMessage(NetworkStream client, string message)
     {
-        string res = "pupupu";
+        string res = "";
         if (message[0] == 'R') UnitColector.getInstance().conectTCPcli(client, message);
-
+        res = UnitColector.getInstance().MassageToUnit(client, message);
         return res;
     }
 
@@ -95,7 +105,7 @@ public class TcpConector
     }
     public static void SendMessage(TcpClient client, string message)
     {
-        NetworkStream stream = new NetworkStream(client.Client, ownsSocket: false);
+        NetworkStream stream = client.GetStream();
         using (stream)
         { SendMessage(stream, message); }
 

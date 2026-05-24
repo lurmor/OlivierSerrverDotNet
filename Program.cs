@@ -40,17 +40,18 @@ namespace OlivierSerrverDotNet
         static void ParseInput(string input)
         {
             var splitedInput = input.Split(' ');
-            if (splitedInput.Length == 2)
+            if (splitedInput.Length == 3)
             {
                 // 1234567890 DT192.168.1.100
                 UnitColector colector = UnitColector.getInstance();
 
 
-                var unitFrom = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[0]));
-                var unitTo = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[1]));
+                var unitFrom = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[1]));
+                var unitTo = UnitColector.getInstance().GetUnit(uint.Parse(splitedInput[2]));
                 if (unitFrom != null && unitTo != null)
                 {
-                    colector.UnitConect(unitFrom, unitTo);
+                    if (splitedInput[0][0] == 'C') colector.UnitConect(unitFrom, unitTo);
+                    if (splitedInput[0][0] == 'D') colector.UnitDisConect(unitFrom, unitTo);
                 }
 
                 // if (unit != null && unit.tcpStream != null)
@@ -63,6 +64,14 @@ namespace OlivierSerrverDotNet
                 if (splitedInput[0] == "Save")
                 {
                     UnitColector.getInstance().SaveToFile("Items.json");
+                }
+                if (splitedInput[0] == "JsonUnits")
+                {
+                    Console.WriteLine(UnitColector.getInstance().ToJsonUnit());
+                }
+                if (splitedInput[0] == "JsonTransfers")
+                {
+                    Console.WriteLine(UnitColector.getInstance().ToJsonTrans());
                 }
             }
         }
